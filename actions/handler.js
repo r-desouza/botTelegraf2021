@@ -1,15 +1,9 @@
 const precios = require('../precios');
 
-const handler = (bot, accion) => bot.action(accion, async ctx => {
+const handler = (bot, accion, ticket) => bot.action(accion, async ctx => {
     const { chat } = ctx;
     const { id: chatId } = chat;
-
-    const ticket = {
-        cliente: ctx.from.first_name,
-        fecha: new Date().toLocaleString(),
-        pedido: [],
-        precioTotal: 0,
-    };
+    let flag = 0;
 
     switch (accion){
         case 'hamburguesa': ticket.pedido.push(
@@ -36,33 +30,20 @@ const handler = (bot, accion) => bot.action(accion, async ctx => {
         );
         ticket.precioTotal += precios.pizza.precio;
         break;
-        case 'generarTicket': ;
+        case 'generarTicket':
+            await bot.telegram.sendMessage(chatId, `Ticket: \n ${ticket.pedido} \n Precio final: ${ticket.precioTotal}`);
+            flag = 1;
         break;
-        case 'seguir': bot.command
+        case 'cancelar':
+            await bot.telegram.sendMessage(chatId, "Pedido Cancelado, use /hacerpedido para volver a realizar un pedido");
+            flag = 1;
+        break;
     };
 
-    console.log(ticket);
-
-    let message = `Hiciste un pedido por: ${accion}\n Desea hacer otro pedido?`;
-
-    await bot.telegram.sendMessage(chatId, message ,{
-        reply_markup:{
-            inline_keyboard:[
-                [
-                    {
-                        text: "Seguir con el pedido",
-                        callback_data: 'seguir'
-                    },
-                    {
-                        text: "Finalizar pedido",
-                        callback_data: 'generarTicket'
-                    }
-                ]
-            ]
-        }
-    });
-
-    // check accion y cfrear un pedido en base a ella
+    if(flag == 0) {
+        let message = `Hiciste un pedido por: ${accion}\n Para finalizar con sus pedidos use el comando /listo`;
+        await bot.telegram.sendMessage(chatId, message);
+    }
 });
 
 module.exports = { handleAccion: handler };

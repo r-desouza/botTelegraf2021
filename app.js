@@ -6,7 +6,15 @@ const { handleAccion } = require('./actions/handler');
 const bot = new Telegraf(TELEGRAF_TOKEN);
 const precios = require('./precios')
 
+const ticket = {
+    cliente: "",
+    fecha: new Date().toLocaleString(),
+    pedido: [],
+    precioTotal: 0,
+};
+
 bot.command('start', async ctx => {
+    ticket.cliente = ctx.chat.first_name
     await bot.telegram.sendMessage(ctx.chat.id, "Bienvenido a la rotiseria! Los comandos disponibles son:\n /hacerpedido")
 });
 
@@ -28,15 +36,36 @@ bot.command('hacerpedido', async ctx => {
                 {
                     text: `Pizza ${precios.pizza.precio}`,
                     callback_data: 'pizza'
+                },
+                    {
+                    text: "Cancelar",
+                    callback_data: 'cancelar'
                 }]
             ]
         }
     })
 });
 
-handleAccion(bot, 'hamburguesa');
-handleAccion(bot, 'lomito');
-handleAccion(bot, 'pizza');
+bot.command('listo', async ctx => {
+    await bot.telegram.sendMessage(ctx.chat.id, "Por favor confirme el pedido", {
+    reply_markup: {
+        inline_keyboard:
+            [
+            [{
+            text: "confimar",
+                callback_data: 'generarTicket',
+            }]
+        ]
+    }
+});
+
+});
+
+handleAccion(bot, 'hamburguesa', ticket);
+handleAccion(bot, 'lomito', ticket);
+handleAccion(bot, 'pizza', ticket);
+handleAccion(bot,'generarTicket', ticket);
+handleAccion(bot, 'cancelar', ticket);
 
 bot.launch()
     .then(() => console.log('Bot online'))
