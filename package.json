@@ -1,0 +1,20 @@
+{
+  "name": "bot_telegram",
+  "version": "1.0.0",
+  "description": "Ejemplo de manejo de Bot de Telegram",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "telegram",
+    "bot"
+  ],
+  "author": "magm",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "nodemailer": "^6.6.3",
+    "telegraf": "^4.4.1"
+  }
+}
